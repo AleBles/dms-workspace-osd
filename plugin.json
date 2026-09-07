@@ -1,0 +1,19 @@
+{
+  "$schema": "https://github.com/AvengeMedia/DankMaterialShell/raw/refs/heads/master/PLUGINS/plugin-schema.json",
+  "id": "workspaceOsdFlash",
+  "name": "Workspace OSD Flash",
+  "description": "Briefly shows the id and name of the workspace you just switched to, centered on that screen.",
+  "version": "0.1.0",
+  "author": "Ale Bles",
+  "license": "MIT",
+  "icon": "preview",
+  "type": "daemon",
+  "capabilities": ["daemon", "ipc"],
+  "category": "utilities",
+  "component": "./WorkspaceOsd.qml",
+  "settings": "./WorkspaceOsdSettings.qml",
+  "startupCheck": "./StartupCheck.qml",
+  "permissions": ["settings_read", "settings_write"],
+  "dependencies": [],
+  "requires_dms": ">=1.6.0"
+}
