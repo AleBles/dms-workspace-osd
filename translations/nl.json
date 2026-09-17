@@ -51,7 +51,7 @@
     "Window titles (App · Title)": "Venstertitels (App · Titel)"
   },
   "App names only": {
-    "App names only": "Alleen appnamen"
+    "App names only": "Alleen app namen"
   },
   "App lines alignment": {
     "App lines alignment": "Uitlijning appregels"
@@ -113,10 +113,10 @@
   "+%1 more": {
     "+%1 more": "+%1 meer"
   },
-  "Hyprland or niri is required": {
-    "Hyprland or niri is required": "Hyprland of niri is vereist"
+  "Unsupported compositor": {
+    "Unsupported compositor": "Niet-ondersteunde compositor"
   },
-  "Workspace OSD Flash listens to Hyprland and niri workspace events and does not work on other compositors.": {
-    "Workspace OSD Flash listens to Hyprland and niri workspace events and does not work on other compositors.": "Workspace OSD Flash luistert naar werkbladgebeurtenissen van Hyprland en niri en werkt niet op andere compositors."
+  "Workspace OSD Flash needs Hyprland, niri, Mango, sway, Miracle WM, labwc or any compositor with ext-workspace-v1.": {
+    "Workspace OSD Flash needs Hyprland, niri, Mango, sway, Miracle WM, labwc or any compositor with ext-workspace-v1.": "Workspace OSD Flash heeft Hyprland, niri, Mango, sway, Miracle WM, labwc of een andere compositor met ext-workspace-v1 nodig."
   }
 }

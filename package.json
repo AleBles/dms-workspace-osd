@@ -1,0 +1,28 @@
+{
+  "name": "dms-workspace-osd",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Dev tooling for the Workspace OSD Flash DMS plugin; DMS itself never reads this file",
+  "license": "MIT",
+  "scripts": {
+    "reload": "dms ipc call plugins reload workspaceOsdFlash",
+    "flash": "dms ipc call wsosd flash 'Workspace 2: test' '' 'foot · Test A | foot · Test B'",
+    "test:hyprland": "dms-testbed run hyprland --plugin . && sleep 2 && dms-testbed switch hyprland 2",
+    "test:niri": "dms-testbed run niri --plugin . && sleep 2 && dms-testbed switch niri 2",
+    "test:mango": "dms-testbed run mango --plugin . && sleep 2 && dms-testbed switch mango 2",
+    "test:sway": "dms-testbed run sway --plugin . && sleep 2 && dms-testbed switch sway 2",
+    "test:labwc": "dms-testbed run labwc --plugin . && sleep 2 && dms-testbed switch labwc 2",
+    "test:miracle": "dms-testbed run miracle --plugin . && sleep 2 && dms-testbed switch miracle 2",
+    "test:all": "npm run test:hyprland && npm run test:niri && npm run test:mango && npm run test:sway && npm run test:labwc && npm run test:miracle",
+    "test:start": "dms-testbed start all",
+    "test:switch": "dms-testbed switch hyprland 3; dms-testbed switch niri 3; dms-testbed switch mango 3; dms-testbed switch sway 3; dms-testbed switch labwc 3; dms-testbed switch miracle 3",
+    "test:reload": "dms-testbed reload hyprland workspaceOsdFlash; dms-testbed reload niri workspaceOsdFlash; dms-testbed reload mango workspaceOsdFlash; dms-testbed reload sway workspaceOsdFlash; dms-testbed reload labwc workspaceOsdFlash; dms-testbed reload miracle workspaceOsdFlash",
+    "test:restart-shell": "dms-testbed restart-shell hyprland; dms-testbed restart-shell niri; dms-testbed restart-shell mango; dms-testbed restart-shell sway; dms-testbed restart-shell labwc; dms-testbed restart-shell miracle",
+    "test:logs": "dms-testbed exec hyprland grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-hyprland.log; dms-testbed exec niri grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-niri.log; dms-testbed exec mango grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-mango.log; dms-testbed exec sway grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-sway.log; dms-testbed exec labwc grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-labwc.log; dms-testbed exec miracle grep -h WorkspaceOsdFlash /home/tester/.local/state/dms-testbed/dms-miracle.log",
+    "test:shot": "mkdir -p screenshots; dms-testbed switch hyprland 2 >/dev/null; sleep 0.4; dms-testbed shot hyprland screenshots/hyprland.png; dms-testbed switch niri 2 >/dev/null; sleep 0.4; dms-testbed shot niri screenshots/niri.png; dms-testbed switch mango 2 >/dev/null; sleep 0.4; dms-testbed shot mango screenshots/mango.png; dms-testbed switch sway 2 >/dev/null; sleep 0.4; dms-testbed shot sway screenshots/sway.png; dms-testbed switch labwc 2 >/dev/null; sleep 0.4; dms-testbed shot labwc screenshots/labwc.png; dms-testbed switch miracle 2 >/dev/null; sleep 0.4; dms-testbed shot miracle screenshots/miracle.png",
+    "test:stop": "dms-testbed stop all"
+  },
+  "devDependencies": {
+    "dms-testbed": "github:AleBles/dms-testbed"
+  }
+}

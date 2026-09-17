@@ -16,16 +16,26 @@ A [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) daemon p
 - Click-through overlay, never steals focus or input
 - Styled like DMS's own OSDs: theme colours, corner radius, popup transparency, elevation shadow, blur and blur border, font family and size, animation speed, light/dark mode
 - Configurable from the DMS settings UI: hold time, fade duration, text size, name on/off, label style, position
+- One small backend file per compositor; every compositor DMS documents is covered
 - Translatable; ships with Dutch
 
 ## Requirements
 
 - DankMaterialShell >= 1.6.0 (uses the plugin translation API introduced in 1.6.0)
-- Hyprland or niri
-  - Hyprland: tested
-  - niri: best effort, implemented against the DMS niri service but not tested yet. Feedback welcome.
+- One of the compositors below. A startup check refuses to enable the plugin anywhere else and shows the reason as a toast.
 
-A startup check refuses to enable the plugin on other compositors and shows the reason as a toast.
+| Compositor | Switch detection | Window list | Status |
+|---|---|---|---|
+| Hyprland | `workspacev2` event | yes | tested |
+| niri | DMS niri service | yes | tested in the testbed |
+| Mango (mangowc) | DMS Mango service, tags shown as workspaces | yes | tested in the testbed |
+| sway | i3 IPC `workspace` event | yes, needs `swaymsg` | tested in the testbed |
+| Miracle WM | i3 IPC `workspace` event | yes, needs `swaymsg` | tested in the testbed (headless Mir) |
+| labwc | ext-workspace-v1 | no (the protocol has no window mapping) | tested in the testbed |
+| scroll | i3 IPC, same backend as sway | yes, needs `scrollmsg` | untested |
+| anything else with ext-workspace-v1 | ext-workspace-v1 | no | untested |
+
+"Tested in the testbed" means the nested containers of [dms-testbed](https://github.com/AleBles/dms-testbed); the author runs Hyprland.
 
 ## Install
 
@@ -49,7 +59,7 @@ dms restart
 
 Then enable it in **DMS Settings → Plugins → Workspace OSD Flash**, or run `dms ipc call plugins enable workspaceOsdFlash`.
 
-Clone rather than symlink: with a symlinked plugin directory Qt refuses to load the startup check (`File name case mismatch` in the DMS log). DMS then skips the check and loads the plugin anyway, so this only matters for development setups.
+After an update that adds new files to the plugin, run `dms restart` once. `dms ipc call plugins reload` reuses Qt's cached directory listing, and a file that was not there when the shell started fails with `File name case mismatch` in the DMS log.
 
 ## Settings
 
@@ -72,7 +82,19 @@ Clone rather than symlink: with a symlinked plugin directory Qt refuses to load 
 
 On Hyprland the DMS rename dialog (`Ctrl + Shift + R` by default) stores the name as `<id> <name>`. The plugin strips the duplicated id, so a workspace renamed to `work` shows as **Workspace 2: work**.
 
-On niri the number shown is the workspace's index on its output, the same number the DMS bar shows.
+On niri the number shown is the workspace's index on its output, the same number the DMS bar shows. On Mango the active tag is the number. On sway a workspace that only has a name shows just the name. On labwc the desktop names from `rc.xml` are the names.
+
+## How it is put together
+
+```
+WorkspaceOsd.qml               daemon: settings, flash state, the card, IPC; loads one backend
+Labels.js                      label and window-line formatting (pure functions)
+backends/WorkspaceBackend.qml  the contract: `workspaceActivated(ws)` + `listWindows(ws, done)`
+backends/HyprlandBackend.qml   NiriBackend.qml  MangoBackend.qml  SwayBackend.qml  ExtWorkspaceBackend.qml
+StartupCheck.qml               refuses unsupported compositors
+```
+
+The daemon maps `CompositorService.compositor` to a backend file (`hyprland`, `niri`, `mango`, and `sway`/`scroll`/`miracle` to the sway backend); anything else gets the ext-workspace backend. To add a compositor, drop a `backends/<Name>Backend.qml` that derives from `WorkspaceBackend` and add one entry to `backendFor` in `WorkspaceOsd.qml`.
 
 ## IPC
 
@@ -82,6 +104,23 @@ Other tools can flash a message on a screen. Quickshell IPC requires every argum
 dms ipc call wsosd flash "Hello" "DP-1" "line one | line two"   # text, monitor ("" = all screens), lines ("" = none)
 dms ipc call wsosd flash "Hello" "" ""
 dms ipc call wsosd hide
+```
+
+Every flash is logged as `[WorkspaceOsdFlash] flash "Workspace 2" on DP-1 - 3 windows` in the DMS log.
+
+## Testing
+
+[dms-testbed](https://github.com/AleBles/dms-testbed) runs DMS in nested containers for all six compositors. With `npm install` (or `bun install`) done once in this repo:
+
+```sh
+npm run test:sway          # start a nested sway with this plugin and switch to workspace 2
+npm run test:all           # all six, one after the other
+npm run test:start         # bring stopped containers back, same mounts, no recreate
+npm run test:switch        # switch every running container to workspace 3
+npm run test:restart-shell # restart DMS inside each container (after adding plugin files)
+npm run test:logs          # the plugin's flash lines from every container's DMS log
+npm run test:shot          # screenshots/<compositor>.png right after a switch
+npm run test:stop
 ```
 
 ## Translations

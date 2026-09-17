@@ -1,16 +1,20 @@
-// Startup gate: the plugin only listens to Hyprland and niri workspace events,
-// so refuse to enable on other compositors (DMS shows the error as a toast).
+// Startup gate: refuse to enable on a compositor no backend can serve (DMS shows the error as a toast).
+// Compositor detection is asynchronous; when it has not finished yet we allow, like DMS itself does.
 import QtQuick
+import Quickshell.WindowManager
 import qs.Common
 import qs.Services
 
 QtObject {
+    readonly property var supported: ["hyprland", "niri", "mango", "sway", "scroll", "miracle"]
+
     function check() {
-        if (CompositorService.isHyprland || CompositorService.isNiri)
-            return null;
+        if (!CompositorService.compositorDetected) return null;
+        if (supported.indexOf(CompositorService.compositor) >= 0) return null;
+        if ((WindowManager.windowsets?.length ?? 0) > 0) return null;      // ext-workspace-v1 (labwc, ...)
         return {
-            title: I18n.trFor("workspaceOsdFlash", "Hyprland or niri is required"),
-            details: I18n.trFor("workspaceOsdFlash", "Workspace OSD Flash listens to Hyprland and niri workspace events and does not work on other compositors.")
+            title: I18n.trFor("workspaceOsdFlash", "Unsupported compositor"),
+            details: I18n.trFor("workspaceOsdFlash", "Workspace OSD Flash needs Hyprland, niri, Mango, sway, Miracle WM, labwc or any compositor with ext-workspace-v1.")
         };
     }
 }
